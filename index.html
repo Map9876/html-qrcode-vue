@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="ZXing for JS">
+    <title>ZXing TypeScript | 解码示例</title>
+    <link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="https://unpkg.com/normalize.css@8.0.0/normalize.css">
+    <link rel="stylesheet" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null" href="https://unpkg.com/milligram@1.3.0/dist/milligram.min.css">
+</head>
+<body>
+    <main class="wrapper" style="padding-top:2em">
+        <section class="container" id="demo-content">
+            <h1 class="title">从本地图像或摄像头扫描一维/二维码</h1>
+            <p>
+                <a class="button-small button-outline" href="../../index.html">首页 🏡</a>
+            </p>
+            <p>此示例展示如何使用ZXing JavaScript库从本地图像文件或摄像头流扫描任何支持的一维/二维码。</p>
+            
+            <!-- 从本地图像解码 -->
+            <div>
+                <h2>从本地图像解码</h2>
+                <input type="file" id="imageFileInput" accept="image/*">
+                <a class="button" id="decodeButton">解码</a>
+                <div id="imagePreview">
+                    <!-- 这里将动态显示选择的图像 -->
+                </div>
+                <label>结果:</label>
+                <pre><code id="resultImage"></code></pre>
+            </div>
+            
+            <!-- 从摄像头流解码 -->
+            <div>
+                <h2>从摄像头流解码</h2>
+                <div>
+                    <a class="button" id="startButton">开始</a>
+                    <a class="button" id="resetButton">重置</a>
+                </div>
+                <div>
+                    <video id="video" width="300" height="200" style="border: 1px solid gray"></video>
+                </div>
+                <div id="sourceSelectPanel" style="display:none">
+                    <label for="sourceSelect">更改视频源:</label>
+                    <select id="sourceSelect" style="max-width:400px"></select>
+                </div>
+                <label>结果:（只要打开摄像头，检测到就会直接显示链接，不需要其他操作），检测到另外一个二维码，也会直接切换链接显示</label>
+                <pre><code id="resultCamera"></code></pre>
+            </div>
+            
+            <p>查看此示例的 <a href="https://github.com/zxing-js/library/tree/master/docs/examples/multi-image/">源代码</a>.</p>
+        </section>
+        <footer class="footer">
+            <section class="container">
+                <p>ZXing TypeScript演示。遵循 <a target="_blank" href="https://github.com/zxing-js/library#license" title="MIT">MIT许可协议</a>。</p>
+            </section>
+        </footer>
+    </main>
+    <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            const codeReader = new ZXing.BrowserMultiFormatReader();
+            console.log('ZXing 代码读取器已初始化');
+
+            // 从本地图像解码
+            document.getElementById('decodeButton').addEventListener('click', () => {
+                const fileInput = document.getElementById('imageFileInput');
+                const file = fileInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const img = new Image();
+                        img.src = reader.result;
+                        img.onload = () => {
+                            codeReader.decodeFromImage(img).then((result) => {
+                                console.log(result);
+                                document.getElementById('resultImage').textContent = result.text;
+                            }).catch((err) => {
+                                console.error(err);
+                                document.getElementById('resultImage').textContent = err;
+                            });
+                            console.log(`开始解码来自 ${file.name} 的图像`);
+                            // 显示图像预览
+                            const imagePreview = document.getElementById('imagePreview');
+                            imagePreview.innerHTML = `<img src="${reader.result}" style="border: 1px solid gray">`;
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    console.error('请选择一个图像文件');
+                }
+            });
+
+            // 从摄像头流解码
+            let selectedDeviceId;
+            codeReader.listVideoInputDevices()
+                .then((videoInputDevices) => {
+                    const sourceSelect = document.getElementById('sourceSelect');
+                    selectedDeviceId = videoInputDevices[0].deviceId;
+                    if (videoInputDevices.length >= 1) {
+                        videoInputDevices.forEach((element) => {
+                            const sourceOption = document.createElement('option');
+                            sourceOption.text = element.label;
+                            sourceOption.value = element.deviceId;
+                            sourceSelect.appendChild(sourceOption);
+                        });
+
+                        sourceSelect.onchange = () => {
+                            selectedDeviceId = sourceSelect.value;
+                        };
+
+                        const sourceSelectPanel = document.getElementById('sourceSelectPanel');
+                        sourceSelectPanel.style.display = 'block';
+                    }
+
+                    document.getElementById('startButton').addEventListener('click', () => {
+                        codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                            if (result) {
+                                console.log(result);
+                                document.getElementById('resultCamera').textContent = result.text;
+                            }
+                            if (err && !(err instanceof ZXing.NotFoundException)) {
+                                console.error(err);
+                                document.getElementById('resultCamera').textContent = err;
+                            }
+                        });
+                        console.log(`Started continuous decode from camera with id ${selectedDeviceId}`);
+                    });
+
+                    document.getElementById('resetButton').addEventListener('click', () => {
+                        codeReader.reset();
+                        document.getElementById('resultCamera').textContent = '';
+                        console.log('Reset.');
+                    });
+
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        });
+    </script>
+</body>
+  <footer>
+    https://github.com/zxing-js/library/tree/master/docs/examples/multi-image/
+  </footer>
+</html>

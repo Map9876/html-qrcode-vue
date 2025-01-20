@@ -2,6 +2,8 @@
 html网页扫码页面 zxing
 二维码扫码 github
 
+https://github.com/zxing-js/library
+
 https://gitee.com › aliwean › NBZxing
 NBZxing: 2020年最好用的开源扫码，全方位优化 ... - Gitee
 
@@ -334,7 +336,7 @@ https://github.com/copilot/c/3ff43558-b38b-4b8a-9f9c-ba5e516ba0d5
 </html>
 ```
 
-
+# 下面是第二种方法
 @zxing/library
 例子项目 https://zxing-js.github.io/library/
 源代码为一个html，

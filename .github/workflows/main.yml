@@ -22,6 +22,6 @@ jobs:
               with:
                 apiToken: ${{ secrets.CF_TOKEN }}
                 accountId: ${{ secrets.CF_ID }}
-                projectName: qrcode-zxing.pages.dev
+                projectName: qrcode-zxing
                 directory: ./
                 wranglerVersion: '3'

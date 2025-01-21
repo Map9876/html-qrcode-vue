@@ -1,7 +1,7 @@
 # html-qrcode-vue
 html网页扫码页面 zxing
 二维码扫码 github
-
+qrcode-zxing.pages.dev
 https://github.com/zxing-js/library
 
 https://gitee.com › aliwean › NBZxing

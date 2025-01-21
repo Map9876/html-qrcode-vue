@@ -702,3 +702,7 @@ https://github.com/zxing-js/library/tree/master/docs/examples/multi-camera/
                     // 默认获取第一个摄像头设备id
                     const firstDeviceId = videoInputDevices[0].deviceId; // 根据id选择摄像头
 ```
+
+
+使用 Github actions 向 Cloudflare Pages 上传网页
+https://c.map987.us.kg/https://zywj0han9.github.io/CFPages/
